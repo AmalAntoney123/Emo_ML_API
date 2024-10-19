@@ -1,14 +1,16 @@
 from flask import Flask, request, jsonify
 import pickle
 import numpy as np
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 # Load the model and scaler
 with open('mood_model.pkl', 'rb') as f:
     model, scaler = pickle.load(f)
 
-@app.route('/predict', methods=['POST'])
+@app.route('/api/predict', methods=['POST'])
 def predict():
     data = request.json
     features = np.array([
@@ -27,5 +29,6 @@ def predict():
 
     return jsonify({'predicted_mood': round(prediction, 1)})
 
-if __name__ == '__main__':
-    app.run(debug=True)
+@app.route('/api/health', methods=['GET'])
+def health_check():
+    return jsonify({'status': 'healthy'}), 200
